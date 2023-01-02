@@ -1,0 +1,9 @@
+[submodule "Lib/Asio"]
+	path = Lib/Asio
+	url = https://github.com/madmaxoft/asio
+[submodule "Lib/Json"]
+	path = Lib/Json
+	url = https://github.com/madmaxoft/nlohmann-json
+[submodule "Lib/NetSurveillancePp"]
+	path = Lib/NetSurveillancePp
+	url = https://github.com/madmaxoft/NetSurveillancePp
