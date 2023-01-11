@@ -6,6 +6,15 @@ project(NetSurveillancePp-Tests LANGUAGES CXX)
 
 
 
+# Enable multithreaded builds in MSVC:
+if(MSVC)
+      add_compile_options(/MP)
+endif()
+
+
+
+
+
 # Enable generating the tests from CMake:
 enable_testing()
 list(APPEND CMAKE_CTEST_ARGUMENTS "--output-on-failure")
