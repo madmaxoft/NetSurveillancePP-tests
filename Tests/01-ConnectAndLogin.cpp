@@ -23,7 +23,7 @@ std::atomic_bool gIsSuccess(false);
 
 
 
-void onFinished(const asio::error_code & aError)
+void onFinished(const std::error_code & aError)
 {
 	if (aError)
 	{
@@ -50,7 +50,7 @@ int main(int aArgc, char * aArgv[])
 	const char * password = (aArgc < 4) ? "builtingPassword" : aArgv[3];
 	std::cout << "Connecting to " << hostName << " using credentials " << userName << " / " << password << "...\n";
 	auto rec = Recorder::create();
-	rec->connectAndLogin("localhost", 34567, userName, password, &onFinished);
+	rec->connectAndLogin(hostName, 34567, userName, password, &onFinished);
 
 	// Wait for completion:
 	{
