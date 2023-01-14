@@ -35,7 +35,8 @@ local args = {...}
 
 -- Message types used by the protocol:
 local MESSAGETYPE_LOGIN_REQ = 999
-local MESSAGETYPE_LOGIN_RESP = 1000
+local MESSAGETYPE_LOGIN_REQ2 = 1000
+local MESSAGETYPE_LOGIN_RESP = 1001
 
 
 
@@ -191,8 +192,8 @@ local function processPayload(aClient, aHeader, aPayload)
 
 	if (aHeader.MessageType == MESSAGETYPE_LOGIN_REQ) then
 		return processPayloadLoginReq(aClient, aHeader, aPayload)
-	elseif (aHeader.MessageType == MESSAGETYPE_LOGIN_RESP) then
-		-- CMS/ VMS send MESSAGETYPE_LOGIN_RESP instead of MESSAGETYPE_LOGIN_REQ, account for that:
+	elseif (aHeader.MessageType == MESSAGETYPE_LOGIN_REQ2) then
+		-- CMS/ VMS send MESSAGETYPE_LOGIN_REQ2 instead of MESSAGETYPE_LOGIN_REQ, account for that:
 		return processPayloadLoginReq(aClient, aHeader, aPayload)
 	-- TODO: Other message types
 	end
