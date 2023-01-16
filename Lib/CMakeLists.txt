@@ -4,4 +4,6 @@ add_library(asio::standalone ALIAS standalone)
 
 add_subdirectory(Json)
 
+add_subdirectory(Fmt EXCLUDE_FROM_ALL)
+
 add_subdirectory(NetSurveillancePp)
