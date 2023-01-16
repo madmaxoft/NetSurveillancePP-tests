@@ -16,8 +16,11 @@ endif()
 
 
 # Enable generating the tests from CMake:
-enable_testing()
 list(APPEND CMAKE_CTEST_ARGUMENTS "--output-on-failure")
+enable_testing()
+if(MSVC)
+	set_property(GLOBAL PROPERTY USE_FOLDERS ON)
+endif()
 
 
 

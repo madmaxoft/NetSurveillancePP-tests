@@ -5,6 +5,7 @@ add_test(
 	NAME 00-SofiaHash-test
 	COMMAND 00-SofiaHash
 )
+set_target_properties(00-SofiaHash PROPERTIES FOLDER "Tests")
 
 
 
@@ -13,7 +14,6 @@ add_test(
 # Test connecting to a localhost simulator:
 add_executable(01-ConnectAndLogin 01-ConnectAndLogin.cpp)
 target_link_libraries(01-ConnectAndLogin PRIVATE NetSurveillancePp-static)
-target_compile_features(01-ConnectAndLogin PRIVATE cxx_std_20)
 add_test(
 	NAME 01-ConnectAndLogin-test-goodlogin
 	COMMAND lua ${CMAKE_CURRENT_SOURCE_DIR}/SimpleSimulatorDriver.lua $<TARGET_FILE:01-ConnectAndLogin> localhost goodUser goodPassword
@@ -24,3 +24,17 @@ add_test(
 	COMMAND lua ${CMAKE_CURRENT_SOURCE_DIR}/SimpleSimulatorDriver.lua --expect-failure $<TARGET_FILE:01-ConnectAndLogin> localhost goodUser badPassword
 	WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
 )
+set_target_properties(01-ConnectAndLogin PROPERTIES FOLDER "Tests")
+
+
+
+
+# Test enumerating channel names against a localhost simulator:
+add_executable(02-EnumChannelNames 02-EnumChannelNames.cpp)
+target_link_libraries(02-EnumChannelNames PRIVATE NetSurveillancePp-static)
+add_test(
+	NAME 02-EnumChannelNames-test
+	COMMAND lua ${CMAKE_CURRENT_SOURCE_DIR}/SimpleSimulatorDriver.lua $<TARGET_FILE:02-EnumChannelNames> localhost goodUser goodPassword
+	WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+)
+set_target_properties(02-EnumChannelNames PROPERTIES FOLDER "Tests")
