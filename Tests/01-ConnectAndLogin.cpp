@@ -47,7 +47,7 @@ int main(int aArgc, char * aArgv[])
 {
 	const char * hostName = (aArgc < 2) ? "localhost" : aArgv[1];
 	const char * userName = (aArgc < 3) ? "builtinUser" : aArgv[2];
-	const char * password = (aArgc < 4) ? "builtingPassword" : aArgv[3];
+	const char * password = (aArgc < 4) ? "builtinPassword" : aArgv[3];
 	std::cout << "Connecting to " << hostName << " using credentials " << userName << " / " << password << "...\n";
 	auto rec = Recorder::create();
 	rec->connectAndLogin(hostName, 34567, userName, password, &onFinished);
