@@ -1,0 +1,2 @@
+# Ignore the local configuration of a real device:
+RealDeviceConfig.lua
