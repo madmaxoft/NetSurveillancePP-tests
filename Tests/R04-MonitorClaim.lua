@@ -3,6 +3,15 @@
 --[[
 Requests live video from a device, using the MONITOR_CLAIM_REQ and MONITOR_REQ messages.
 Stores the received video to a file, terminating after 5 seconds.
+
+Tested on firmwares:
+	- V4.03.R11.J5980233.12201.140000.0000001 (NVR)
+	- V4.03.R11.C6380235.12201.140000.0000000 (NVR-test)
+	- V4.03.R11.C638014A.12201.142300.0000000 (DVR-test)
+	- V4.03.R11.34531191.1000 (DVR-old)
+Seems to work on all. If there's a mismatch between the channels in the OPMonitor-Claim and OPMonitor-Start
+packets, returns a 103 error.
+The device may send both video and audio frames.
 --]]
 
 

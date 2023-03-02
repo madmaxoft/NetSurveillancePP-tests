@@ -6,10 +6,11 @@ Stores the received picture to a file.
 
 Tested on firmwares:
 	- V4.03.R11.J5980233.12201.140000.0000001 (NVR)
-
-Seems to require only the Channel parameter with the "OPSNAP" method (acquired from a disassembled
-NetSDK.dll, function H264_DVR_CatchPic); the returned picture has a predefined resolution, with
-no obvious method of requesting a different one.
+		Seems to require only the Channel parameter with the "OPSNAP" method (acquired from a disassembled
+		NetSDK.dll, function H264_DVR_CatchPic); the returned picture has a predefined resolution, with
+		no obvious method of requesting a different one.
+	- V4.03.R11.34531191.1000 (DVR-old)
+		Doesn't seem support the "OPSNAP" method, returns error code 102 in a regular JSON
 --]]
 
 
@@ -32,7 +33,7 @@ assert(dev:sendRequest(MessageType.NetSnap_Req,
 		Name = "OPSNAP",
 		OPSNAP =
 		{
-			Channel = 1,
+			Channel = 0,
 		}
 	}
 ))

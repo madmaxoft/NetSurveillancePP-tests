@@ -7,6 +7,7 @@ Tested on firmwares:
 	- V4.03.R11.J5980233.12201.140000.0000001 (NVR)
 	- V4.03.R11.C6380235.12201.140000.0000000 (NVR-test)
 	- V4.03.R11.C638014A.12201.142300.0000000 (DVR-test)
+	- V4.03.R11.34531191.1000 (DVR-old)
 The device doesn't respond to this request at all.
 Additionally, trying logging in with a bad username and password first and then enumerating has the same result, no answer.
 --]]
