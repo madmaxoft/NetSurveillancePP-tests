@@ -2,6 +2,7 @@
 RealDeviceConfig.lua
 
 # Ignore the files received from the device in Rnn tests:
+pic.jpg
 video.h264
 video.h265
 video.raw
