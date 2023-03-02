@@ -144,6 +144,12 @@ MessageType =
 	SysUpgradeInfo_Req  = 1525,
 	SysUpgradeInfo_Resp = 1526,
 
+	-- Capture control:
+	NetSnap_Req    = 1560,
+	NetSnap_Resp   = 1561,
+	SetIFrame_Req  = 1562,
+	SetIFrame_Resp = 1563,
+
 	-- Time sync:
 	SyncTime_Req  = 1590,
 	SyncTime_Resp = 1591,

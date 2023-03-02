@@ -33,9 +33,9 @@ local Nvr = {}
 
 
 
---- Class prototype representing a single device to which a connection has been established
+--- Class prototype representing a single TCP connection to a device
 -- Provides the functions available to the objects of this class
-local Device =
+local Connection =
 {
 	-- The socket to be used for communicating with the device (will be set by Nvr.connect())
 	mSocket = nil,
@@ -46,7 +46,7 @@ local Device =
 	-- The sequence number of the next packet to send
 	mSequenceNum = 0,
 }
-Device.__index = Device
+Connection.__index = Connection
 
 
 
@@ -54,7 +54,7 @@ Device.__index = Device
 
 --- Connects to the specified hostname and port
 -- Doesn't send any information yet.
--- Returns a Device object on success, nil and error message on failure
+-- Returns a Connection object on success, nil and error message on failure
 function Nvr.connect(aHostName, aPort)
 	assert(type(aHostName) == "string")
 	assert(type(aPort) == "number")
@@ -68,9 +68,9 @@ function Nvr.connect(aHostName, aPort)
 		return nil, msg
 	end
 
-	-- Create a new Device instance:
+	-- Create a new Connection instance:
 	local res = {mSocket = skt}
-	setmetatable(res, Device)
+	setmetatable(res, Connection)
 
 	return res
 end
@@ -79,10 +79,10 @@ end
 
 
 
---- Sends the specified request to the device
+--- Sends the specified request through the connection
 -- The payload can be either a direct string to send, or a table, which will be first converted to JSON
 -- Returns true on success, nil and message on failure
-function Device:sendRequest(aMessageType, aPayload)
+function Connection:sendRequest(aMessageType, aPayload)
 	assert(type(aMessageType) == "number")
 	assert((type(aPayload) == "string") or (type(aPayload) == "table"))
 	assert(type(self.mSocket) == "userdata")  -- We need a valid socket
@@ -110,12 +110,12 @@ end
 
 
 
---- Receives a single JSON response from the device
+--- Receives a single JSON response from the device on the Connection
 -- Returns the response as a table parsed from JSON and the message type indicated in the protocol on success
 -- Returns nil and message on failure
 -- Note that responses from the device that indicate a device-side error (the Ret field) are still
--- reported as success; use Device:checkResponse() to process those
-function Device:receiveResponse()
+-- reported as success; use Connection:checkResponse() to process those
+function Connection:receiveResponse()
 	-- Receive the response data:
 	local resp, msg = self:receiveResponseData()
 	if not(resp) then
@@ -137,10 +137,13 @@ end
 
 
 
---- Receives a single response from the device
+--- Receives a single response from the device on the Connection
+-- If aAllowLargePayload is true, doesn't check the PayloadLength
 -- Returns the response as a raw string and the message type indicated in the protocol on success
 -- Returns nil and message on failure
-function Device:receiveResponseData()
+function Connection:receiveResponseData(aAllowLargePayload)
+	assert(not(aAllowLargePayload) or (aAllowLargePayload == true))
+
 	-- Receive the header:
 	local hdr, msg = self.mSocket:receive(20)
 	if not(hdr) then
@@ -153,11 +156,16 @@ function Device:receiveResponseData()
 	if (parsedHdr.MessageType > 2000) then
 		return nil, "Not a NetSurveillance protocol, the MessageType is too large"
 	end
-	if (parsedHdr.PayloadLength > 65536) then
-		return nil, "Not a NetSurveillanceProtocol, the PayloadLength is too large"
+	if not(aAllowLargePayload) then
+		if (parsedHdr.PayloadLength > 65536) then
+			return nil, "Not a NetSurveillanceProtocol, the PayloadLength is too large"
+		end
 	end
 
 	-- Receive the body
+	if (parsedHdr.PayloadLength == 0) then
+		return "", parsedHdr.MessageType
+	end
 	local body
 	body, msg = self.mSocket:receive(parsedHdr.PayloadLength)
 	if not(body) then
@@ -175,8 +183,8 @@ end
 -- Returns nil and the error description on failure
 -- Returns nil and message type if the response is nil
 -- The message type is not directly used for checking, but it allows chaining the function together with Device:receiveResponse():
--- local resp, msgType = dev:checkResponse(dev:receiveResponse())
-function Device:checkResponse(aResponse, aMessageType)
+-- local resp, msgType = conn:checkResponse(conn:receiveResponse())
+function Connection:checkResponse(aResponse, aMessageType)
 	-- If the response is not set, assume chaining from a failed receiveResponse() and relay:
 	if (aResponse == nil) then
 		return nil, aMessageType
@@ -205,7 +213,7 @@ end
 --- Receives a response and checks its Ret field for errors
 -- On success, returns true, the message type from the header and the parsed response
 -- On failure, returns nil, the error message and optionally the parsed response
-function Device:receiveAndCheckResponse()
+function Connection:receiveAndCheckResponse()
 	-- Receive the response:
 	local resp, msg = self:receiveResponse()
 	if not(resp) then
@@ -231,7 +239,7 @@ end
 -- aPasswordHash is the SofiaHash of the real password
 -- Returns the device's response (parsed into a table) and stores the mSessionID on success
 -- On failure, returns nil, error message and possibly device's response as a table parsed from JSON
-function Device:login(aUsername, aPasswordHash)
+function Connection:login(aUsername, aPasswordHash)
 	assert(type(aUsername) == "string")
 	assert(type(aPasswordHash) == "string")
 	assert(string.len(aPasswordHash) == 8)  -- The hash is always 8 characters long
@@ -278,7 +286,7 @@ end
 --- Enumerates the channel titles
 -- Returns an array-table of the channel titles on success
 -- On failure, returns nil, message and possibly the device's response as a table parsed from JSON
-function Device:enumChannelTitles()
+function Connection:enumChannelTitles()
 	assert(type(self.mSocket) == "userdata")  -- We need a valid socket
 
 	-- Send the request:

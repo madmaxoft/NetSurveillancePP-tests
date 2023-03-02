@@ -1,2 +1,8 @@
 # Ignore the local configuration of a real device:
 RealDeviceConfig.lua
+
+# Ignore the files received from the device in Rnn tests:
+video.h264
+video.h265
+video.raw
+video.mp4
