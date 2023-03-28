@@ -141,6 +141,41 @@ end
 
 
 
+local function processPayloadNetSnap(aClient, aHeader, aPayload)
+	assert(type(aClient) == "userdata")
+	assert(type(aHeader) == "table")
+	assert(type(aPayload) == "string")
+
+	-- User needs to be logged in:
+	if not(gIsLoggedIn) then
+		print("Cannot send ChannelTitle response, not logged in.")
+		return sendPayload(aClient, MessageType.ConfigChannelTitleGet_Resp, {Ret = Error.UserNotLoggedIn})
+	end
+
+	-- We only support the OPSNAP request:
+	local j = assert(json.decode(aPayload))
+	if (j.Name ~= "OPSNAP") then
+		print("Cannot send OPSNAP response, requesting unknown Name: " .. tostring(j.Name))
+		return sendPayload(aClient, MessageType.NetSnap_Resp, {Ret = Error.IllegalRequest})
+	end
+	if (not(j.OPSNAP) or (type(j.OPSNAP) ~= "table")) then
+		print("Cannot send OPSNAP response, there is no params: " .. type(j.OPSNAP))
+		return sendPayload(aClient, MessageType.NetSnap_Resp, {Ret = Error.IllegalRequest})
+	end
+	if (not(j.OPSNAP.Channel) or not(tostring(j.OPSNAP.Channel))) then
+		print("Cannot send OPSNAP response, cannot parse Channel param: " .. tostring(j.OPSNAP.Channel))
+		return sendPayload(aClient, MessageType.NetSnap_Resp, {Ret = Error.IllegalRequest})
+	end
+
+	-- Success, send bogus data:
+	print("Sending an example picture (OPSNAP) data.")
+	sendPayload(aClient, MessageType.NetSnap_Resp, "bogusdata")
+end
+
+
+
+
+
 --- Processes the payload
 local function processPayload(aClient, aHeader, aPayload)
 	assert(type(aHeader) == "table")
@@ -153,6 +188,8 @@ local function processPayload(aClient, aHeader, aPayload)
 		return processPayloadKeepAlive(aClient, aHeader, aPayload)
 	elseif (aHeader.MessageType == MessageType.ConfigChannelTitleGet_Req) then
 		return processPayloadConfigChannelTitleGet(aClient, aHeader, aPayload)
+	elseif (aHeader.MessageType == MessageType.NetSnap_Req) then
+		return processPayloadNetSnap(aClient, aHeader, aPayload)
 	-- TODO: Other message types
 	end
 end
