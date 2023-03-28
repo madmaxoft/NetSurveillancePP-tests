@@ -147,6 +147,9 @@ function Connection:receiveResponseData(aAllowLargePayload)
 	-- Receive the header:
 	local hdr, msg = self.mSocket:receive(20)
 	if not(hdr) then
+		if (msg == "timeout") then
+			return nil, "timeout"
+		end
 		return nil, "Failed to receive response header: " .. tostring(msg)
 	end
 	local parsedHdr = parseHeader(hdr)
@@ -316,6 +319,20 @@ function Connection:enumChannelTitles()
 	end
 
 	return resp.ChannelTitle
+end
+
+
+
+
+
+--- Sets the specified timeout for socket operations
+-- If a timeout is set, the receive* methods may return with a [nil, "timeout"] return value combo
+-- indicating the timeout was reached without receiving any data.
+function Connection:setTimeout(aTimeoutSec)
+	assert(type(self) == "table")
+	assert(type(self.mSocket) == "userdata")  -- We need a valid socket
+
+	self.mSocket:settimeout(aTimeoutSec)
 end
 
 

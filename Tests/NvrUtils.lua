@@ -155,6 +155,18 @@ MessageType =
 	SyncTime_Resp = 1591,
 }
 
+-- Catch attempts to use undefined message types:
+setmetatable(MessageType,
+	{
+		__index = function(...)
+			assert(false, "Using an undefined message type")
+		end,
+		__newindex = function(...)
+			assert(false, "Writing to a read-only table")
+		end
+	}
+)
+
 
 
 
