@@ -43,7 +43,7 @@ set_target_properties(02-EnumChannelNames PROPERTIES FOLDER "Tests")
 
 
 
-# Test receiving a picture from a channel on a real device:
+# Test receiving a picture:
 add_executable(03-CapturePicture 03-CapturePicture.cpp)
 target_link_libraries(03-CapturePicture PRIVATE NetSurveillancePp-static)
 add_test(
@@ -52,3 +52,17 @@ add_test(
 	WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
 )
 set_target_properties(03-CapturePicture PROPERTIES FOLDER "Tests")
+
+
+
+
+
+# Test receiving alarms:
+add_executable(04-MonitorAlarms 04-MonitorAlarms.cpp)
+target_link_libraries(04-MonitorAlarms PRIVATE NetSurveillancePp-static)
+add_test(
+	NAME 04-MonitorAlarms-test
+	COMMAND lua ${CMAKE_CURRENT_SOURCE_DIR}/SimpleSimulatorDriver.lua $<TARGET_FILE:04-MonitorAlarms> localhost goodUser goodPassword 2
+	WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+)
+set_target_properties(04-MonitorAlarms PROPERTIES FOLDER "Tests")

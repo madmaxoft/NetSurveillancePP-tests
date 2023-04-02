@@ -34,6 +34,9 @@ local gSequenceNum = 0
 --- True if the client logged in successfully, false if not.
 local gIsLoggedIn = false
 
+--- True if the client asked for alarm notifications.
+local gWantsAlarms = false
+
 -- The cmdline args provided to this script
 local args = {...}
 
@@ -148,8 +151,8 @@ local function processPayloadNetSnap(aClient, aHeader, aPayload)
 
 	-- User needs to be logged in:
 	if not(gIsLoggedIn) then
-		print("Cannot send ChannelTitle response, not logged in.")
-		return sendPayload(aClient, MessageType.ConfigChannelTitleGet_Resp, {Ret = Error.UserNotLoggedIn})
+		print("Cannot send OPSNAP response, not logged in.")
+		return sendPayload(aClient, MessageType.NetSnap_Resp, {Ret = Error.UserNotLoggedIn})
 	end
 
 	-- We only support the OPSNAP request:
@@ -176,6 +179,31 @@ end
 
 
 
+local function processPayloadGuard(aClient, aHeader, aPayload)
+	assert(type(aClient) == "userdata")
+	assert(type(aHeader) == "table")
+	assert(type(aPayload) == "string")
+
+	-- User needs to be logged in:
+	if not(gIsLoggedIn) then
+		print("Cannot send Guard response, not logged in.")
+		return sendPayload(aClient, MessageType.Guard_Resp, {Ret = Error.UserNotLoggedIn})
+	end
+
+	-- TODO: Check if real device accepts multiple guard requests.
+	-- If already monitoring alarms, report an error:
+	-- TODO
+
+	-- Success, start sending alarms
+	print("Client will receive alarms")
+	gWantsAlarms = true
+	sendPayload(aClient, MessageType.Guard_Resp, '{ "Name" : "", "Ret" : 100, "SessionID" : "0x0000000D" }')
+end
+
+
+
+
+
 --- Processes the payload
 local function processPayload(aClient, aHeader, aPayload)
 	assert(type(aHeader) == "table")
@@ -190,8 +218,65 @@ local function processPayload(aClient, aHeader, aPayload)
 		return processPayloadConfigChannelTitleGet(aClient, aHeader, aPayload)
 	elseif (aHeader.MessageType == MessageType.NetSnap_Req) then
 		return processPayloadNetSnap(aClient, aHeader, aPayload)
+	elseif (aHeader.MessageType == MessageType.Guard_Req) then
+		return processPayloadGuard(aClient, aHeader, aPayload)
 	-- TODO: Other message types
 	end
+	assert(false, "Unhandled mesasge type: " .. tostring(aHeader.MessageType))
+end
+
+
+
+
+
+--- Sends a single alarm event to the client
+-- An alarm event consists of a Start and Stop packet
+local function sendAlarm(aClient)
+	assert(type(aClient) == "userdata")
+
+	print("Sending an alarm.")
+	local timestamp = os.date("%Y-%m-%d %H:%M:%S")
+	sendPayload(aClient, MessageType.Alarm_Req, '{ "AlarmInfo" : { "Channel" : 0, "Event" : "VideoMotion", "StartTime" : "' .. timestamp .. '", "Status" : "Start" }, "Name" : "AlarmInfo", "SessionID" : "0xd" }')
+	sendPayload(aClient, MessageType.Alarm_Req, '{ "AlarmInfo" : { "Channel" : 0, "Event" : "VideoMotion", "StartTime" : "' .. timestamp .. '", "Status" : "Stop" }, "Name" : "AlarmInfo", "SessionID" : "0xd" }')
+end
+
+
+
+
+
+--- Receives exactly the specified number of bytes from the client
+-- Returns the received bytes, as a string, on success
+-- If the requested number of bytes is zero, returns an empty string
+-- If there's a timeout while receiving, either sends an alarm (if alarm monitoring has been requested) or raises an error (if not)
+-- If there's any other error while receiving, throws the error
+local function receiveBytesFromClient(aClient, aNumBytes)
+	assert(type(aClient) == "userdata")
+	assert(type(aNumBytes) == "number")
+
+	local received = ""
+	while (aNumBytes > 0) do
+		local d, msg, partial = aClient:receive(aNumBytes)
+		if not(d) then
+			if (msg == "timeout") then
+				-- Timeout waiting for the next request, send an alarm if alarm monitoring is on:
+				if (gWantsAlarms) then
+					sendAlarm(aClient)
+					received = received .. (partial or "")
+					aNumBytes = aNumBytes - string.len(partial or "")
+				else
+					error(msg)
+				end
+			else
+				-- Another error from the socket, raise it:
+				error(msg)
+			end
+		else
+			-- Received without any problems
+			received = received .. d
+			aNumBytes = aNumBytes - string.len(d)
+		end
+	end
+	return received
 end
 
 
@@ -201,15 +286,11 @@ end
 local function simulateClient(aClient)
 	assert(type(aClient) == "userdata")
 
+	aClient:settimeout(2)
 	while (true) do
-		local header = parseHeader(assert(aClient:receive(20)))
+		local header = parseHeader(receiveBytesFromClient(aClient, 20))
 		print("Received a header, want payload: " .. header.PayloadLength .. " bytes")
-		local payload
-		if (header.PayloadLength > 0) then
-			payload = assert(aClient:receive(header.PayloadLength))
-		else
-			payload = ""
-		end
+		local payload = receiveBytesFromClient(aClient, header.PayloadLength)
 		processPayload(aClient, header, payload)
 	end
 end
@@ -236,4 +317,5 @@ while (true) do
 	if (gIsSingleShot) then
 		return
 	end
+	gWantsAlarms = false
 end
