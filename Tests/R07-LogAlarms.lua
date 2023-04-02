@@ -13,6 +13,7 @@ The alarms are received from the device whenever they occur, as a MessageType.Al
 { "AlarmInfo" : { "Channel" : 0, "Event" : "VideoMotion", "StartTime" : "2023-03-03 12:48:20", "Status" : "Start" }, "Name" : "AlarmInfo", "SessionID" : "0x1c" }
 { "AlarmInfo" : { "Channel" : 1, "Event" : "VideoMotion", "StartTime" : "2023-03-03 18:41:31", "Status" : "Stop" }, "Name" : "AlarmInfo", "SessionID" : "0x1c" }
 The device doesn't expect any response for the alarm (but normally terminates the connection if there's no keepalive sent by the client)
+The device ignores multiple Guard requests.
 --]]
 
 

@@ -190,10 +190,6 @@ local function processPayloadGuard(aClient, aHeader, aPayload)
 		return sendPayload(aClient, MessageType.Guard_Resp, {Ret = Error.UserNotLoggedIn})
 	end
 
-	-- TODO: Check if real device accepts multiple guard requests.
-	-- If already monitoring alarms, report an error:
-	-- TODO
-
 	-- Success, start sending alarms
 	print("Client will receive alarms")
 	gWantsAlarms = true
