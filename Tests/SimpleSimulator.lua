@@ -37,6 +37,10 @@ local gIsLoggedIn = false
 --- True if the client asked for alarm notifications.
 local gWantsAlarms = false
 
+--- Number of timeouts that need to happen before an alarm is sent to the client
+-- Decremented upon each timeout; when it reaches zero, an alarm is sent and this timer reset to another random value
+local gNumTimeoutsBeforeAlarm = math.random(1, 3)
+
 -- The cmdline args provided to this script
 local args = {...}
 
@@ -256,7 +260,11 @@ local function receiveBytesFromClient(aClient, aNumBytes)
 			if (msg == "timeout") then
 				-- Timeout waiting for the next request, send an alarm if alarm monitoring is on:
 				if (gWantsAlarms) then
-					sendAlarm(aClient)
+					gNumTimeoutsBeforeAlarm = gNumTimeoutsBeforeAlarm - 1
+					if (gNumTimeoutsBeforeAlarm <= 0) then
+						sendAlarm(aClient)
+						gNumTimeoutsBeforeAlarm = math.random(1, 3)
+					end
 					received = received .. (partial or "")
 					aNumBytes = aNumBytes - string.len(partial or "")
 				else
