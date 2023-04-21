@@ -11,6 +11,10 @@ Tested on firmwares:
 		no obvious method of requesting a different one.
 	- V4.03.R11.34531191.1000 (DVR-old)
 		Doesn't seem support the "OPSNAP" method, returns error code 102 in a regular JSON
+
+Sometimes the firmware gets "stuck" when requesting a snapshot, it will not reply for several seconds and
+then respond with a Ret=108 json response ("timeout"). It will keep reporting timeout for all subsequent
+snapshot requests, not even a day of inactivity and session closure clears the timeout.
 --]]
 
 
