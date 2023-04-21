@@ -286,6 +286,41 @@ end
 
 
 
+--- Sends the logout request to the device and parses the response.
+-- Returns the device's response (parsed into a table).
+-- On failure, returns nil, error message and possibly device's response as a table parsed from JSON.
+function Connection:logout()
+	assert(type(self.mSessionID) == "number")  -- We need a valid session
+	assert(type(self.mSocket) == "userdata")  -- We need a valid socket
+
+	-- Send the login request:
+	local isSuccess, msg = self:sendRequest(MessageType.Logout_Req,
+		{
+			Name = "",
+			SessionID = string.format("0x%x", self.mSessionID),
+		}
+	)
+	if not(isSuccess) then
+		return nil, msg
+	end
+
+	-- Receive the response:
+	local resp, msgType
+	isSuccess, msgType, resp = self:receiveAndCheckResponse()
+	if not(isSuccess) then
+		return nil, msgType, resp
+	end
+
+	-- Reset the SessionID:
+	self.mSessionID = nil
+
+	return resp
+end
+
+
+
+
+
 --- Enumerates the channel titles
 -- Returns an array-table of the channel titles on success
 -- On failure, returns nil, message and possibly the device's response as a table parsed from JSON
