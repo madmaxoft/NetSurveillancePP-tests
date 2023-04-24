@@ -197,6 +197,7 @@ local function processPayloadGuard(aClient, aHeader, aPayload)
 	-- Success, start sending alarms
 	print("Client will receive alarms")
 	gWantsAlarms = true
+	aClient:settimeout(1)  -- Timeout after 1 second when reporting alarms
 	sendPayload(aClient, MessageType.Guard_Resp, '{ "Name" : "", "Ret" : 100, "SessionID" : "0x0000000D" }')
 end
 
@@ -290,7 +291,6 @@ end
 local function simulateClient(aClient)
 	assert(type(aClient) == "userdata")
 
-	aClient:settimeout(2)
 	while (true) do
 		local header = parseHeader(receiveBytesFromClient(aClient, 20))
 		print("Received a header, want payload: " .. header.PayloadLength .. " bytes")
@@ -304,7 +304,7 @@ end
 
 
 -- Simulate:
-local server = assert(socket.bind("localhost", 34567))
+local server = assert(socket.bind("localhost", 34567, 0))
 for _, arg in ipairs(args) do
 	if (arg == "--use-timeout") then
 		server:settimeout(10)
@@ -317,7 +317,11 @@ print("Simulator ready.\n\n")
 io.output():flush()
 while (true) do
 	local client = assert(server:accept())
+	print("Client connected: " .. tostring(client:getpeername()))
 	local res, msg = pcall(simulateClient, client)
+	if not(res) then
+		print("Client terminated: " .. tostring(msg))
+	end
 	if (gIsSingleShot) then
 		return
 	end
