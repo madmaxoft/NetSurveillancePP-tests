@@ -2,7 +2,7 @@
 #include <mutex>
 #include <atomic>
 #include <iostream>
-#include "Fmt/format.h"
+#include "fmt/format.h"
 #include "Recorder.hpp"
 #include "Root.hpp"
 
