@@ -360,6 +360,26 @@ end
 
 
 
+--- Sends the KeepAlive packet and waits for the response
+-- Returns the KeepAlive response body as parsed JSON on success.
+-- Returns nil and error message on failure.
+function Connection:sendRecvKeepAlive()
+	assert(type(self) == "table")
+	assert(type(self.mSocket) == "userdata")  -- We need a valid socket
+
+	local isSuccess, msg = self:sendRequest(MessageType.KeepAlive_Req, {Name = "KeepAlive", SessionID = self.mSessionID})
+	if not(isSuccess) then
+		return nil, msg
+	end
+
+	isSuccess, msg = self:receiveResponse()
+	return isSuccess, msg
+end
+
+
+
+
+
 --- Sets the specified timeout for socket operations
 -- If a timeout is set, the receive* methods may return with a [nil, "timeout"] return value combo
 -- indicating the timeout was reached without receiving any data.
