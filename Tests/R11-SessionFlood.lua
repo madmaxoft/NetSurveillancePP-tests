@@ -7,7 +7,7 @@ Tested on firmwares:
 	- V4.03.R11.C638014A.12201.142300.0000000 (DVR-test)
 		The NVR accepts about a 100 sessions in an eyeblink, then struggles to SYN-ACK the next
 		TCP connection for a few seconds, then blazingly fast accepts another 100 sessions again, and repeats.
-		This looks suspicious, so existing-session verificatino was added (whether the old sessions don't
+		This looks suspicious, so existing-session verification was added (whether the old sessions don't
 		just silently die).
 		After adding the check for alive connections, the NVR drops connections after ~280 are made (though
 		the test executes for tens of minutes then).

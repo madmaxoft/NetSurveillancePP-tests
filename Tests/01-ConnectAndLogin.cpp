@@ -43,14 +43,21 @@ void onFinished(const std::error_code & aError)
 
 
 
-int main(int aArgc, char * aArgv[])
+int main(int aArgC, char * aArgV[])
 {
-	const char * hostName = (aArgc < 2) ? "localhost" : aArgv[1];
-	const char * userName = (aArgc < 3) ? "builtinUser" : aArgv[2];
-	const char * password = (aArgc < 4) ? "builtinPassword" : aArgv[3];
-	std::cout << "Connecting to " << hostName << " using credentials " << userName << " / " << password << "...\n";
+	auto hostName = (aArgC < 2) ? "localhost" : aArgV[1];
+	auto portStr  = (aArgC < 3) ? "34567" : aArgV[2];
+	auto userName = (aArgC < 4) ? "builtinUser" : aArgV[3];
+	auto password = (aArgC < 5) ? "builtinPassword" : aArgV[4];
+	auto port = std::atoi(portStr);
+	if (port == 0)
+	{
+		std::cerr << "Cannot parse port, using default 34567 instead";
+		port = 34567;
+	}
+	std::cout << "Connecting to " << hostName << " : " << port << " using credentials " << userName << " / " << password << "...\n";
 	auto rec = Recorder::create();
-	rec->connectAndLogin(hostName, 34567, userName, password, &onFinished);
+	rec->connectAndLogin(hostName, port, userName, password, &onFinished);
 
 	// Wait for completion:
 	{

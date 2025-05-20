@@ -85,13 +85,20 @@ static void onLoginFinished(std::shared_ptr<Recorder> aRecorder, const std::erro
 
 int main(int aArgC, char * aArgV[])
 {
-	const char * hostName = (aArgC < 2) ? "localhost" : aArgV[1];
-	const char * userName = (aArgC < 3) ? "builtinUser" : aArgV[2];
-	const char * password = (aArgC < 4) ? "builtingPassword" : aArgV[3];
-	gNumAlarmsLeft = (aArgC < 5) ? -1 : std::atoi(aArgV[4]);
-	std::cout << "Connecting to " << hostName << " using credentials " << userName << " / " << password << "...\n";
+	auto hostName = (aArgC < 2) ? "localhost" : aArgV[1];
+	auto portStr  = (aArgC < 3) ? "34567" : aArgV[2];
+	auto userName = (aArgC < 4) ? "builtinUser" : aArgV[3];
+	auto password = (aArgC < 5) ? "builtinPassword" : aArgV[4];
+	gNumAlarmsLeft = (aArgC < 6) ? -1 : std::atoi(aArgV[5]);
+	auto port = std::atoi(portStr);
+	if (port == 0)
+	{
+		std::cerr << "Cannot parse port, using default 34567 instead";
+		port = 34567;
+	}
+	std::cout << "Connecting to " << hostName << " : " << port << " using credentials " << userName << " / " << password << "...\n";
 	auto rec = Recorder::create();
-	rec->connectAndLogin(hostName, 34567, userName, password, 
+	rec->connectAndLogin(hostName, port, userName, password,
 		[rec](const std::error_code & aError)
 		{
 			onLoginFinished(rec, aError);

@@ -357,7 +357,7 @@ function serializeHeader(aSessionID, aSequenceNum, aMessageType, aPayloadLen)
 	assert(type(aPayloadLen) == "number")
 
 	return
-		"\xff\0\0\0" ..  -- Head, Version, Reserved1, Reserved2
+		string.char(255, 0, 0, 0) .. -- Head, Version, Reserved1, Reserved2
 		writeUint32(aSessionID) ..
 		writeUint32(aSequenceNum) ..
 		"\0\0" ..  -- TotalPkt, CurrPkt

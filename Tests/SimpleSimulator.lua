@@ -60,6 +60,7 @@ local function sendPayload(aClient, aMessageType, aPayload)
 	end
 
 	-- Send the data:
+	print("Sending payload of type " .. tostring(aMessageType) .. ".")
 	aClient:send(serializeHeader(gSessionID, gSequenceNum, aMessageType, string.len(aPayload)))
 	aClient:send(aPayload)
 	gSequenceNum = gSequenceNum + 1
