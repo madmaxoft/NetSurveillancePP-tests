@@ -158,11 +158,11 @@ MessageType =
 -- Catch attempts to use undefined message types:
 setmetatable(MessageType,
 	{
-		__index = function(...)
-			assert(false, "Using an undefined message type")
+		__index = function(aType)
+			assert(false, "Using an undefined message type (" .. tostring(aType) .. ")")
 		end,
-		__newindex = function(...)
-			assert(false, "Writing to a read-only table")
+		__newindex = function(aType)
+			assert(false, "Writing to a read-only table (" .. tostring(aType) .. ")")
 		end
 	}
 )

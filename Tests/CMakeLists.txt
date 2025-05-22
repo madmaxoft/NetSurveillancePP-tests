@@ -66,3 +66,31 @@ add_test(
 	WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
 )
 set_target_properties(04-MonitorAlarms PROPERTIES FOLDER "Tests")
+
+
+
+
+
+# Test receiving config:
+add_executable(05-ReceiveConfig 05-ReceiveConfig.cpp)
+target_link_libraries(05-ReceiveConfig PRIVATE NetSurveillancePp-static)
+add_test(
+	NAME 05-ReceiveConfig-test
+	COMMAND lua ${CMAKE_CURRENT_SOURCE_DIR}/SimpleSimulatorDriver.lua $<TARGET_FILE:05-ReceiveConfig> localhost 34567 goodUser goodPassword
+	WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+)
+set_target_properties(05-ReceiveConfig PROPERTIES FOLDER "Tests")
+
+
+
+
+
+# Test receiving SysInfo:
+add_executable(06-ReceiveSysInfo 06-ReceiveSysInfo.cpp)
+target_link_libraries(06-ReceiveSysInfo PRIVATE NetSurveillancePp-static)
+add_test(
+	NAME 06-ReceiveSysInfo-test
+	COMMAND lua ${CMAKE_CURRENT_SOURCE_DIR}/SimpleSimulatorDriver.lua $<TARGET_FILE:06-ReceiveSysInfo> localhost 34567 goodUser goodPassword
+	WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+)
+set_target_properties(05-ReceiveConfig PROPERTIES FOLDER "Tests")

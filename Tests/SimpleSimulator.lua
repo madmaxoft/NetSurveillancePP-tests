@@ -206,6 +206,75 @@ end
 
 
 
+local function processPayloadSysInfo(aClient, aHeader, aPayload)
+	assert(type(aHeader) == "table")
+	assert(type(aHeader.MessageType) == "number")
+	assert(type(aPayload) == "string")
+
+	local j = assert(json.decode(aPayload))
+	if (j.Name == "SystemInfo") then
+		-- Send bogus SysInfo data:
+		print("Sending an example SysInfo SystemInfo data.")
+		sendPayload(aClient, MessageType.SysInfo_Resp,
+			{
+				SystemInfo =
+				{
+					AlarmInChannel = 0,
+					AlarmOutChannel = 0,
+					AudioInChannel = 0,
+				},
+				Name = "SystemInfo",
+				Ret = Error.Success,
+				SessionID = 0x0d,
+			}
+		)
+	end
+
+	-- Send an error: Unknown config name:
+	return sendPayload(aClient, MessageType.SysInfo_Resp, {Ret = Error.IllegalRequest, Msg = "Unknown config name"})
+end
+
+
+
+
+
+local function processPayloadGetConfig(aClient, aHeader, aPayload)
+	assert(type(aHeader) == "table")
+	assert(type(aHeader.MessageType) == "number")
+	assert(type(aPayload) == "string")
+
+	local j = assert(json.decode(aPayload))
+	if (j.Name == "General.General") then
+		-- Send bogus config data:
+		print("Sending an example config General.General data.")
+		sendPayload(aClient, MessageType.ConfigGet_Resp,
+			{
+				["General.General"] =
+				{
+					LocalNo = 8,
+					AutoLogout = 0,
+					ScreenAutoShutdown = 10,
+					ScreenSaveTime = 0,
+					OverWrite = "OverWrite",
+					VideoOutPut = "AUTO",
+					MachineName = "XiongMai",
+					SnapInterval = 2,
+				},
+				Name = "General.General",
+				Ret = Error.Success,
+				SessionID = 0x0d,
+			}
+		)
+	end
+
+	-- Send an error: Unknown config name:
+	return sendPayload(aClient, MessageType.ConfigGet_Resp, {Ret = Error.IllegalRequest, Msg = "Unknown config name"})
+end
+
+
+
+
+
 --- Processes the payload
 local function processPayload(aClient, aHeader, aPayload)
 	assert(type(aHeader) == "table")
@@ -222,6 +291,10 @@ local function processPayload(aClient, aHeader, aPayload)
 		return processPayloadNetSnap(aClient, aHeader, aPayload)
 	elseif (aHeader.MessageType == MessageType.Guard_Req) then
 		return processPayloadGuard(aClient, aHeader, aPayload)
+	elseif (aHeader.MessageType == MessageType.SysInfo_Req) then
+		return processPayloadSysInfo(aClient, aHeader, aPayload)
+	elseif (aHeader.MessageType == MessageType.ConfigGet_Req) then
+		return processPayloadGetConfig(aClient, aHeader, aPayload)
 	-- TODO: Other message types
 	end
 	assert(false, "Unhandled mesasge type: " .. tostring(aHeader.MessageType))
