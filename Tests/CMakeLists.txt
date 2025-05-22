@@ -93,4 +93,18 @@ add_test(
 	COMMAND lua ${CMAKE_CURRENT_SOURCE_DIR}/SimpleSimulatorDriver.lua $<TARGET_FILE:06-ReceiveSysInfo> localhost 34567 goodUser goodPassword
 	WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
 )
-set_target_properties(05-ReceiveConfig PROPERTIES FOLDER "Tests")
+set_target_properties(06-ReceiveSysInfo PROPERTIES FOLDER "Tests")
+
+
+
+
+
+# Test receiving Ability:
+add_executable(07-ReceiveAbility 07-ReceiveAbility.cpp)
+target_link_libraries(07-ReceiveAbility PRIVATE NetSurveillancePp-static)
+add_test(
+	NAME 07-ReceiveAbiliy-test
+	COMMAND lua ${CMAKE_CURRENT_SOURCE_DIR}/SimpleSimulatorDriver.lua $<TARGET_FILE:07-ReceiveAbility> localhost 34567 goodUser goodPassword
+	WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+)
+set_target_properties(07-ReceiveAbility PROPERTIES FOLDER "Tests")

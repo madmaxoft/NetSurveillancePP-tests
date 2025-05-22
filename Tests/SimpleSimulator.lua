@@ -231,7 +231,34 @@ local function processPayloadSysInfo(aClient, aHeader, aPayload)
 	end
 
 	-- Send an error: Unknown config name:
-	return sendPayload(aClient, MessageType.SysInfo_Resp, {Ret = Error.IllegalRequest, Msg = "Unknown config name"})
+	return sendPayload(aClient, MessageType.SysInfo_Resp, {Ret = Error.IllegalRequest, Msg = "Unknown SysInfo name"})
+end
+
+
+
+
+
+local function processPayloadAbility(aClient, aHeader, aPayload)
+	assert(type(aHeader) == "table")
+	assert(type(aHeader.MessageType) == "number")
+	assert(type(aPayload) == "string")
+
+	local j = assert(json.decode(aPayload))
+	if (j.Name == "MultiLanguage") then
+		-- Send bogus Ability data:
+		print("Sending an example Ability MultiLanguage data.")
+		sendPayload(aClient, MessageType.AbilityGet_Resp,
+			{
+				MultiLanguage = {"English", "Czech", "Slovakia"},
+				Name = "MultiLanguage",
+				Ret = Error.Success,
+				SessionID = 0x0d,
+			}
+		)
+	end
+
+	-- Send an error: Unknown config name:
+	return sendPayload(aClient, MessageType.AbilityGet_Resp, {Ret = Error.IllegalRequest, Msg = "Unknown Ability name"})
 end
 
 
@@ -293,6 +320,8 @@ local function processPayload(aClient, aHeader, aPayload)
 		return processPayloadGuard(aClient, aHeader, aPayload)
 	elseif (aHeader.MessageType == MessageType.SysInfo_Req) then
 		return processPayloadSysInfo(aClient, aHeader, aPayload)
+	elseif (aHeader.MessageType == MessageType.AbilityGet_Req) then
+		return processPayloadAbility(aClient, aHeader, aPayload)
 	elseif (aHeader.MessageType == MessageType.ConfigGet_Req) then
 		return processPayloadGetConfig(aClient, aHeader, aPayload)
 	-- TODO: Other message types
