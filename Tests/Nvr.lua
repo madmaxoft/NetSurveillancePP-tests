@@ -323,7 +323,7 @@ end
 
 --- Enumerates the channel titles
 -- Returns an array-table of the channel titles on success
--- On failure, returns nil, message and possibly the device's response as a table parsed from JSON
+-- On failure, returns nil, message type and possibly the device's response as a table parsed from JSON
 function Connection:enumChannelTitles()
 	assert(type(self.mSocket) == "userdata")  -- We need a valid socket
 
@@ -354,6 +354,38 @@ function Connection:enumChannelTitles()
 	end
 
 	return resp.ChannelTitle
+end
+
+
+
+
+
+--- Retrieves the specified SysInfo from the device
+-- Returns a table parsed from the returned json on success
+-- On failure, returns nil, message type and possibly the device's response as a table parsed from JSON
+function Connection:getSysInfo(aSysInfoName)
+	assert(type(self.mSocket) == "userdata")  -- We need a valid socket
+	assert(type(aSysInfoName) == "string")
+
+	-- Send the request:
+	local isSuccess, msg = self:sendRequest(MessageType.SysInfo_Req,
+		{
+			Name = aSysInfoName,
+			SessionID = string.format("0x%x", self.mSessionID),
+		}
+	)
+	if not(isSuccess) then
+		return nil, msg
+	end
+
+	-- Receive the response:
+	local resp, msgType
+	isSuccess, msgType, resp = self:receiveAndCheckResponse()
+	if not(isSuccess) then
+		return nil, msgType, resp
+	end
+
+	return resp
 end
 
 
