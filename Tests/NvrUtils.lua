@@ -85,12 +85,12 @@ MessageType =
 	TalkClaim_Resp = 1435,
 
 	-- File search:
-	FileSearch_Req         = 1440,
-	FileSearch_Resp        = 1441,
-	LogSearch_Req          = 1442,
-	LogSearch_Resp         = 1443,
-	FileSearchByTime_Req   = 1444,
-	FileSearchByTyime_Resp = 1445,
+	FileSearch_Req        = 1440,
+	FileSearch_Resp       = 1441,
+	LogSearch_Req         = 1442,
+	LogSearch_Resp        = 1443,
+	FileSearchByTime_Req  = 1444,
+	FileSearchByTime_Resp = 1445,
 
 	-- System management:
 	SysMgr_Req     = 1450,
