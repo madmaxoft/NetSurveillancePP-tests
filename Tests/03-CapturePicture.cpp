@@ -75,7 +75,7 @@ static void onLoginFinished(std::shared_ptr<Recorder> aRecorder, const std::erro
 	else
 	{
 		std::cout << fmt::format("Logged in, requesting a picture from channel {}...\n", gChannel);
-		aRecorder->capturePicture(gChannel, &onPicture);
+		aRecorder->capturePicture(&onPicture, gChannel);
 	}
 }
 
