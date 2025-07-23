@@ -108,3 +108,17 @@ add_test(
 	WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
 )
 set_target_properties(07-ReceiveAbility PROPERTIES FOLDER "Tests")
+
+
+
+
+
+# Test parsing the raw captured video (from R15 real device test):
+add_executable(08-ParseRawCapturedStream 08-ParseRawCapturedStream.cpp)
+target_link_libraries(08-ParseRawCapturedStream PRIVATE NetSurveillancePp-static)
+add_test(
+	NAME 08-ParseRawCapturedStream-test
+	COMMAND $<TARGET_FILE:08-ParseRawCapturedStream> R15-out.raw
+	WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+)
+set_target_properties(08-ParseRawCapturedStream PROPERTIES FOLDER "Tests")
