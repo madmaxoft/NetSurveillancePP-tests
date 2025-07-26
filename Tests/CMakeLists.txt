@@ -113,7 +113,7 @@ set_target_properties(07-ReceiveAbility PROPERTIES FOLDER "Tests")
 
 
 
-# Test parsing the raw captured video (from R15 real device test):
+# Test parsing the raw captured video (from R15 real device test or test-09):
 add_executable(08-ParseRawCapturedStream 08-ParseRawCapturedStream.cpp)
 target_link_libraries(08-ParseRawCapturedStream PRIVATE NetSurveillancePp-static)
 add_test(
@@ -122,3 +122,31 @@ add_test(
 	WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
 )
 set_target_properties(08-ParseRawCapturedStream PROPERTIES FOLDER "Tests")
+
+
+
+
+
+# Test capturing the raw captured video (same as R15 real device test):
+add_executable(09-SaveCapturedStreamRaw 09-SaveCapturedStreamRaw.cpp)
+target_link_libraries(09-SaveCapturedStreamRaw PRIVATE NetSurveillancePp-static)
+set_target_properties(09-SaveCapturedStreamRaw PROPERTIES FOLDER "Tests")
+
+
+
+
+
+# Test downloading a remote playback file (same as R16 real device test):
+add_executable(10-SaveRemotePlaybackRaw 10-SaveRemotePlaybackRaw.cpp)
+target_link_libraries(10-SaveRemotePlaybackRaw PRIVATE NetSurveillancePp-static)
+set_target_properties(10-SaveRemotePlaybackRaw PROPERTIES FOLDER "Tests")
+
+
+
+
+
+# A gateway that claims a live video stream, strips the CapturedStream wrapper and provides the raw video
+# data in a local TCP server. This can be the played back using e.g. "ffplay tcp://localhost:<port>"
+add_executable(ChannelLiveVideoTcpGateway ChannelLiveVideoTcpGateway.cpp)
+target_link_libraries(ChannelLiveVideoTcpGateway PRIVATE NetSurveillancePp-static)
+set_target_properties(ChannelLiveVideoTcpGateway PROPERTIES FOLDER "Tools")

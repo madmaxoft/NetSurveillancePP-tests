@@ -1,10 +1,9 @@
+#include "fmt/format.h"
 #define _CRT_SECURE_NO_WARNINGS 1
 #include <mutex>
 #include <atomic>
 #include <iostream>
-#include "fmt/format.h"
 #include "Recorder.hpp"
-#include "Root.hpp"
 
 
 
@@ -28,7 +27,7 @@ int gChannel = 0;
 
 
 
-static void onPicture(const std::error_code & aError, const char * aData, size_t aSize)
+static void onPicture(const std::error_code & aError, const void * aData, size_t aSize)
 {
 	if (aError)
 	{
@@ -93,7 +92,7 @@ int main(int aArgC, char * aArgV[])
 	auto port = std::atoi(portStr);
 	if (port == 0)
 	{
-		std::cerr << "Cannot parse port, using default 34567 instead";
+		std::cerr << "Cannot parse port, using default 34567 instead\n";
 		port = 34567;
 	}
 	std::cout << "Connecting to " << hostName << " : " << port << " using credentials " << userName << " / " << password << "...\n";
